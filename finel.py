@@ -64,6 +64,7 @@ def handle_interesting_games(message: Message):
 def handle_recommends(message: Message):
     recommends_bot(message)
 
+
 def games(message: Message):
     bot.send_message(message.chat.id, "You have the following games:\n- Field of wonders✍️\n- Who wants to become a millionaire?\n- Guess a number❓\n- Rock, Paper, Scissors✂️📄")
     
@@ -78,6 +79,7 @@ def games(message: Message):
 
     sent_message = bot.send_message(message.chat.id, "Select the game you want:", reply_markup=key_board)
     bot.register_next_step_handler(sent_message, handle_message_of_games)
+
 
 def handle_message_of_games(message: Message):
     if message.text == "Field of wonders":
@@ -94,20 +96,22 @@ def handle_message_of_games(message: Message):
         bot.send_message(message.chat.id, "Invalid selection, please choose a game or 'Back to menu'.")
         games(message)
 
+
 def start_of_mill(message: Message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(KeyboardButton('Play'), KeyboardButton('Back to menu'))
     bot.send_message(message.chat.id, "Це гра 'Хто хоче стати мільйонером?'.", reply_markup=markup)
 
+
 @bot.message_handler(func=lambda message: message.text == 'Play')
 def play(message: Message):
     user_data[message.chat.id] = {
         'score': 50, 
-        # 'lifelines': {'50/50': True, 'Call a friend': True},
         'asked_questions': []
     }
     save_user_data(user_data)
-    ask_random_question(message.chat.id)
+    ask_random_question(message)  
+
 
 @bot.message_handler(func=lambda message: message.text == 'Back to menu')
 def back_to_menu(message: Message):
@@ -116,7 +120,9 @@ def back_to_menu(message: Message):
     bot.send_message(message.chat.id, "Ви повернулись до головного меню.", reply_markup=markup)
     games(message)
 
-def ask_random_question(chat_id):
+
+def ask_random_question(message: Message):  
+    chat_id = message.chat.id
     user_info = user_data.get(chat_id)
     asked_questions = user_info['asked_questions']
     remaining_questions = [qid for qid in questions_db.keys() if qid not in asked_questions]
@@ -132,7 +138,7 @@ def ask_random_question(chat_id):
     question_data = questions_db[question_id]
     question = question_data["question"]
     options = question_data["options"]
-    image_url = question_data["URL-question"]  # Дістаємо URL з питання
+    image_url = question_data["URL-question"]  
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     for option in options:
@@ -142,7 +148,9 @@ def ask_random_question(chat_id):
     bot.send_photo(chat_id, photo=image_url, caption=f"Запитання: {question}", reply_markup=markup)
     save_user_data(user_data)
 
-def check_answer(chat_id, user_answer):
+
+def check_answer(message: Message, user_answer): 
+    chat_id = message.chat.id
     user_info = user_data.get(chat_id)
     last_question_id = user_info['asked_questions'][-1]
     correct_answer = questions_db[last_question_id]['correct']
@@ -150,15 +158,13 @@ def check_answer(chat_id, user_answer):
     if user_answer.upper().startswith(correct_answer):
         user_info['score'] *= 2
         bot.send_message(chat_id, f"Правильно! Ваш поточний рахунок: {user_info['score']}. Наступне запитання...")
+        ask_random_question(message)  
     else:
         bot.send_message(chat_id, f"Неправильно! Правильна відповідь: {correct_answer}. Гра закінчена.\nВаш остаточний рахунок: {user_info['score']}.")
         del user_data[chat_id]
         save_user_data(user_data)
-        return False  
+        back_to_menu(message)  
 
-    save_user_data(user_data)
-    ask_random_question(chat_id)
-    return True  
 
 @bot.message_handler(func=lambda message: message.text.startswith(('A', 'B', 'C', 'D')))
 def answer(message: Message):
@@ -167,7 +173,8 @@ def answer(message: Message):
 
     if user_info:
         user_answer = message.text.strip().upper()
-        check_answer(chat_id, user_answer)
+        check_answer(message, user_answer)  
+
 
 
 def start_guess_number_game(message: Message):
