@@ -1,9 +1,10 @@
 import telebot
 from telebot.types import Message, ReplyKeyboardMarkup, ReplyKeyboardRemove, KeyboardButton
-import os
 import json
 import pyjokes
 import random
+import emoji
+from questions_db import questions_db
 
 bot = telebot.TeleBot('8065963420:AAFjcK5RAPVtiSe-YrhqX-6w-XahCtisn08')
 
@@ -16,160 +17,6 @@ attempts_for_guess = 0
 greeting_shown = {}
 
 DATA_FILE = 'user_data.json'
-
-questions_db = {
-    1: {
-        "question": "Яка планета відома своїми кільцями?",
-        "options": ["A) Юпітер", "B) Сатурн", "C) Нептун", "D) Марс"],
-        "correct": "B"
-    },
-    2: {
-        "question": "Яка наукова дисципліна вивчає поведінку живих організмів?",
-        "options": ["A) Фізика", "B) Хімія", "C) Біологія", "D) Астрономія"],
-        "correct": "C"
-    },
-    3: {
-        "question": "Хто написав 'Гаррі Поттера'?",
-        "options": ["A) Касандра Кларк", "B) Джоан Роулінг", "C) Стівен Кінг", "D) Сесілія Ахерн"],
-        "correct": "B"
-    },
-    4: {
-        "question": "Яка країна є батьківщиною олімпійських ігор?",
-        "options": ["A) Рим", "B) Греція", "C) Кіпр", "D) Єгипет"],
-        "correct": "B"
-    },
-    5: {
-        "question": "Яка частина людського тіла найбільше містить кісток?",
-        "options": ["A) Рука", "B) Нога", "C) Хребет", "D) Череп"],
-        "correct": "C"
-    },
-    6: {
-        "question": "Яка планета є найбільшою в нашій Сонячній системі?",
-        "options": ["A) Венера", "B) Земля", "C) Юпітер", "D) Сатурн"],
-        "correct": "C"
-    },
-    7: {
-        "question": "Який газ є основним компонентом земної атмосфери?",
-        "options": ["A) Кисень", "B) Азот", "C) Вуглекислий газ", "D) Аргон"],
-        "correct": "B"
-    },
-    8: {
-        "question": "Хто написав роман '1984'?",
-        "options": ["A) Френсіс Скотт Фіцджеральд", "B) Джордж Оруелл", "C) Ернест Хемінгуей", "D) Марк Твен"],
-        "correct": "B"
-    },
-    9: {
-        "question": "Яка ріка є найдовшою у світі?",
-        "options": ["A) Ніл", "B) Амазонка", "C) Янцзи", "D) Міссісіпі"],
-        "correct": "A"
-    },
-    10: {
-        "question": "Скільки днів у лютому в невисокосному році?",
-        "options": ["A) 28", "B) 29", "C) 30", "D) 31"],
-        "correct": "A"
-    },
-    11: {
-        "question": "Яка країна славиться своїми кенгуру?",
-        "options": ["A) Канада", "B) Австралія", "C) Бразилія", "D) Індія"],
-        "correct": "B"
-    },
-    12: {
-        "question": "Яка відома вежа розташована в Парижі?",
-        "options": ["A) Біг-Бен", "B) Вежа Клейтон", "C) Ейфелева вежа", "D) Вежа Бурдж Халіфа"],
-        "correct": "C"
-    },
-    13: {
-        "question": "Кого вважають 'батьком' сучасної фізики?",
-        "options": ["A) Ісаак Ньютон", "B) Альберт Ейнштейн", "C) Галілео Галілей", "D) Нільс Бор"],
-        "correct": "B"
-    },
-    14: {
-        "question": "Яка країна є найбільшим виробником кави у світі?",
-        "options": ["A) Ефіопія", "B) Колумбія", "C) Бразилія", "D) В'єтнам"],
-        "correct": "C"
-    },
-    15: {
-        "question": "Яка з наступних хвороб викликана вірусом?",
-        "options": ["A) Діабет", "B) Грип", "C) Астма", "D) Гіпертонія"],
-        "correct": "B"
-    },
-    16: {
-        "question": "У якому році відбулася перша висадка людини на Місяць?",
-        "options": ["A) 1965", "B) 1969", "C) 1971", "D) 1975"],
-        "correct": "B"
-    },
-    17: {
-        "question": "Яка тварина є символом США?",
-        "options": ["A) Лев", "B) Орел", "C) Ведмідь", "D) Слон"],
-        "correct": "B"
-    },
-    18: {
-        "question": "Хто створив теорію відносності?",
-        "options": ["A) Нікола Тесла", "B) Альберт Ейнштейн", "C) Стівен Гокінг", "D) Річард Фейнман"],
-        "correct": "B"
-    },
-    19: {
-        "question": "Яка найвища гора у світі?",
-        "options": ["A) К2", "B) Гімалаї", "C) Еверест", "D) Монблан"],
-        "correct": "C"
-    },
-    20: {
-        "question": "Який континент є найбільшим за площею?",
-        "options": ["A) Європа", "B) Африка", "C) Азія", "D) Південна Америка"],
-        "correct": "C"
-    },
-    21: {
-        "question": "Яка валюта використовується в Японії?",
-        "options": ["A) Долар", "B) Євро", "C) Йена", "D) Фунт"],
-        "correct": "C"
-    },
-    22: {
-        "question": "Яка релігія є найпоширенішою у світі?",
-        "options": ["A) Християнство", "B) Іслам", "C) Буддизм", "D) Індуїзм"],
-        "correct": "A"
-    },
-    23: {
-        "question": "Який метал є рідкісним і найдорожчим на ринку?",
-        "options": ["A) Золото", "B) Срібло", "C) Платина", "D) Паладій"],
-        "correct": "D"
-    },
-    24: {
-        "question": "Яка країна відома своєю пірамідою Хеопса?",
-        "options": ["A) Іран", "B) Єгипет", "C) Ірак", "D) Греція"],
-        "correct": "B"
-    },
-    25: {
-        "question": "Який винахід пов'язаний з ім'ям Александра Граема Белла?",
-        "options": ["A) Телевізор", "B) Телефон", "C) Комп'ютер", "D) Радіо"],
-        "correct": "B"
-    },
-    26: {
-        "question": "Який основний компонент сонячного світла?",
-        "options": ["A) Кисень", "B) Вода", "C) Світло", "D) Тепло"],
-        "correct": "C"
-    },
-    27: {
-        "question": "Який місто є столицею Франції?",
-        "options": ["A) Лондон", "B) Париж", "C) Мадрид", "D) Рим"],
-        "correct": "B"
-    },
-    28: {
-        "question": "Яка з цих технологій дозволяє користувачам спілкуватися в реальному часі через інтернет?",
-        "options": ["A) SMS", "B) Email", "C) Відеозв'язок", "D) Сигнали диму"],
-        "correct": "C"
-    },
-    29: {
-        "question": "Яка найбільша пустеля на планеті?",
-        "options": ["A) Сахара", "B) Гобі", "C) Арктична пустеля", "D) Пустеля Калахарі"],
-        "correct": "A"
-    },
-    30: {
-        "question": "Яка соціальна мережа була заснована Марком Цукербергом?",
-        "options": ["A) Twitter", "B) Instagram", "C) Facebook", "D) LinkedIn"],
-        "correct": "C"
-    }
-}
-
 
 def load_user_data():
     try:
@@ -193,9 +40,10 @@ def start(message: Message):
         button2 = KeyboardButton(text='Little-bit recommends')
         key_board.add(button1, button2)
 
-        bot.send_message(
+        bot.send_photo(
             message.chat.id,
-            "Hi my dear User!!\nI'm your bot telegram\nHere you can play different games which you want (Pick an option on the keyboard)",
+            photo= "https://cdn-icons-png.flaticon.com/512/4712/4712024.png",
+            caption= "Hi my dear User 👋!!\nI'm your bot telegram 😄\n (Pick an option on the keyboard)",
             reply_markup=key_board
         )
     else:
@@ -217,7 +65,7 @@ def handle_recommends(message: Message):
     recommends_bot(message)
 
 def games(message: Message):
-    bot.send_message(message.chat.id, "You have the following games:\n- Field of wonders\n- Who wants to become a millionaire?\n- Guess a number\n- Rock, Paper, Scissors")
+    bot.send_message(message.chat.id, "You have the following games:\n- Field of wonders✍️\n- Who wants to become a millionaire?\n- Guess a number❓\n- Rock, Paper, Scissors✂️📄")
     
     key_board = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button1 = KeyboardButton(text='Field of wonders')
@@ -249,13 +97,13 @@ def handle_message_of_games(message: Message):
 def start_of_mill(message: Message):
     markup = ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(KeyboardButton('Play'), KeyboardButton('Back to menu'))
-    bot.send_message(message.chat.id, "Привіт! Це гра 'Хто хоче стати мільйонером?'.", reply_markup=markup)
+    bot.send_message(message.chat.id, "Це гра 'Хто хоче стати мільйонером?'.", reply_markup=markup)
 
 @bot.message_handler(func=lambda message: message.text == 'Play')
 def play(message: Message):
     user_data[message.chat.id] = {
         'score': 50, 
-        'lifelines': {'50/50': True, 'Call a friend': True},
+        # 'lifelines': {'50/50': True, 'Call a friend': True},
         'asked_questions': []
     }
     save_user_data(user_data)
@@ -284,13 +132,14 @@ def ask_random_question(chat_id):
     question_data = questions_db[question_id]
     question = question_data["question"]
     options = question_data["options"]
+    image_url = question_data["URL-question"]  # Дістаємо URL з питання
 
     markup = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     for option in options:
         markup.add(KeyboardButton(option))
     markup.add(KeyboardButton("Back to menu"))
 
-    bot.send_message(chat_id, f"Запитання: {question}", reply_markup=markup)
+    bot.send_photo(chat_id, photo=image_url, caption=f"Запитання: {question}", reply_markup=markup)
     save_user_data(user_data)
 
 def check_answer(chat_id, user_answer):
@@ -354,7 +203,8 @@ def start_game_of_rps(message: Message):
     button3 = KeyboardButton(text="Scissors")
     key_board.add(button1, button2, button3)
 
-    sent_message = bot.send_message(message.chat.id, "Choose your option:", reply_markup=key_board)
+    sent_message = bot.send_photo(message.chat.id,photo="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQK2hjx56TFg7oUrkPoStVlJEM-Az560Pa2lQ&s", 
+                    caption= "Choose your option:", reply_markup=key_board)
     bot.register_next_step_handler(sent_message, play_rps)
 
 def play_rps(message: Message):
@@ -474,7 +324,7 @@ def recommends_bot(message: Message):
     key_board.add(button1, button2, button3, button4, button5, button6)
 
     sent_message = bot.send_message(message.chat.id, "BOT recommends for you: "\
-        "\n- Films \n- Music \n- Games by genre \n- Anecdots \n- Interestig history"\
+        "\n- Films📽️🎬 \n- Music🎼🎺 \n- Games by genre🎰🎮 \n- Anecdots😂😂 \n- Interestig history🤫🤫"\
         "\n Select recommends from BOT, what are you want:", reply_markup = key_board)
     
     bot.register_next_step_handler(sent_message, handle_message)
