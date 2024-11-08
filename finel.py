@@ -6,7 +6,7 @@ import random
 import emoji
 from questions_db import questions_db
 
-bot = telebot.TeleBot('8065963420:AAFjcK5RAPVtiSe-YrhqX-6w-XahCtisn08')
+bot = telebot.TeleBot('')
 
 ADMIN = []
 word_list = ["python", "telegram", "bot", "game", "wonder", "guess", "play", "fun"]
